@@ -9,28 +9,26 @@
 *
 ********************************************************************************************/
 
-#include "raylib.h"
+#include "baseGame.h"
 
 int main()
 {
 	// Initialization
 	//--------------------------------------------------------------------------------------
-	int screenWidth = 800;
-	int screenHeight = 450;
-
-	InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
-
-	SetTargetFPS(60);
+	baseGame game = *new baseGame();
+	game.init();
 	//--------------------------------------------------------------------------------------
 
 	// Main game loop
 	while (!WindowShouldClose())    // Detect window close button or ESC key
 	{
-		// Update
-		//----------------------------------------------------------------------------------
-		// TODO: Update your variables here
-		//----------------------------------------------------------------------------------
+		game.update();
 
+		while (game.shouldFixedUpdate()) {
+			//fixed update
+			game.fixedUpdate();
+		}
+		
 		// Draw
 		//----------------------------------------------------------------------------------
 		BeginDrawing();
