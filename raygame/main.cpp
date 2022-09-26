@@ -9,24 +9,25 @@
 *
 ********************************************************************************************/
 
-#include "baseGame.h"
+#include "demoGame.h"
 
 int main()
 {
 	// Initialization
 	//--------------------------------------------------------------------------------------
-	baseGame game = *new baseGame();
+	demoGame game = *new demoGame();
 	game.init();
 	//--------------------------------------------------------------------------------------
 
 	// Main game loop
 	while (!WindowShouldClose())    // Detect window close button or ESC key
 	{
-		game.update();
+		game.tick();
 
 		while (game.shouldFixedUpdate()) {
 			//fixed update
-			game.fixedUpdate();
+			//mainly used for physics update
+			game.fixedTick();
 		}
 		
 		// Draw
@@ -41,10 +42,7 @@ int main()
 		//----------------------------------------------------------------------------------
 	}
 
-	// De-Initialization
-	//--------------------------------------------------------------------------------------   
-	CloseWindow();        // Close window and OpenGL context
-	//--------------------------------------------------------------------------------------
+	game.exit();
 
 	return 0;
 }

@@ -2,6 +2,8 @@
 
 #include "physicsObject.h"
 
+#include <vector>
+
 class baseGame
 {
 public:
@@ -9,10 +11,22 @@ public:
 
 	float targetFixedStep; //amount of time used for fixedDeltaTime
 	float accumulatedFixedTime; //time since start of program
+	int screenWidth;
+	int screenHeight;
+	bool useWrapping;
 
-	void init(); //initialization
-	void update();
-	void fixedUpdate();
+	std::vector<physicsObject> physObjs;
+
+	void init();
+	void tick();
+	void fixedTick();
+	void draw();
+
+	void virtual onInit() {} //initialization
+	void virtual onTick() {} //update
+	void virtual onFixedTick() {} //physics update
+	void virtual onDraw() {}
+	void exit();
 
 	bool shouldFixedUpdate();
 

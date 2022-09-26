@@ -144,20 +144,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="baseGame.cpp" />
-    <ClCompile Include="collider.cpp" />
+    <ClCompile Include="demoGame.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="physics.cpp" />
     <ClCompile Include="physicsObject.cpp" />
-    <ClCompile Include="rigidBody.cpp" />
-    <ClCompile Include="transform.cpp" />
+    <ClCompile Include="shapes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="baseGame.h" />
-    <ClInclude Include="collider.h" />
-    <ClInclude Include="physics.h" />
+    <ClInclude Include="demoGame.h" />
+    <ClInclude Include="enumUtil.h" />
     <ClInclude Include="physicsObject.h" />
-    <ClInclude Include="rigidBody.h" />
-    <ClInclude Include="transform.h" />
+    <ClInclude Include="shapes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
