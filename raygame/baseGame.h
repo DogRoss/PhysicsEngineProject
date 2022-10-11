@@ -1,33 +1,44 @@
 #pragma once
 
+#include <vector>
+#include <unordered_map>
+
 #include "physicsObject.h"
 
-#include <vector>
+using collisionPair = uint8_t;
+using collisionFunc = bool(*)(const Vector2&, const shape&, const Vector2&, const shape&);
+using collisionMap = std::unordered_map<collisionPair, collisionFunc>;
 
-class baseGame
-{
+using depenetrationFunc = Vector2(*)(const Vector2&, const shape&, const Vector2&, const shape&, float& pen);
+using depenetrationMap = std::unordered_map <collisionPair, depenetrationFunc>;
+
+class baseGame {
+	float accumulatedFixedTime;
+
+	std::vector<physicsObject> physicsObjects;
+	static collisionMap collisionCheckers;
+	static depenetrationMap collisionDepenetrators;
+
+	void virtual onInit() { }
+	void virtual onTick() { }
+	void virtual onTickPhys() { }
+	void virtual onDraw() const { }
+	void virtual onExit() { }
 public:
-	baseGame(); //default constructor
-
-	float targetFixedStep; //amount of time used for fixedDeltaTime
-	float accumulatedFixedTime; //time since start of program
-	int screenWidth;
-	int screenHeight;
-	bool useWrapping;
-
-	std::vector<physicsObject> physObjs;
+	baseGame();
 
 	void init();
 	void tick();
-	void fixedTick();
-	void draw();
-
-	void virtual onInit() {} //initialization
-	void virtual onTick() {} //update
-	void virtual onFixedTick() {} //physics update
-	void virtual onDraw() {}
+	void tickFixed();
+	void draw() const;
 	void exit();
 
-	bool shouldFixedUpdate();
+	bool shouldClose() const;
+	bool shouldTickFixed() const;
 
+	float targetFixedStep;
+	float gravityScale;
+
+	bool useGravity;
+	bool useWrapping;
 };

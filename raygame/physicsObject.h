@@ -6,38 +6,34 @@
 class physicsObject
 {
 public:
+	Vector2 pos;
+	Vector2 vel;
+
+	Vector2 forces;
+
 	physicsObject();
+
+	float mass;
+	float drag;
+
+	bool useGravity;
+	bool isStatic;
 
 	shape collider;
 
-	//rigidbody physics
-	float mass;
-	float drag;
-	float gravity;
-	bool isStatic;
+	void tickPhys(Vector2 force);
+	void draw() const;
 
-	//positional data
-	Vector2 position;
-	Vector2 velocity;
-	Vector2 forces;
+	// Add continous force in relation to mass
+	void addForce(Vector2 force);
+	// Add instant force in relation to mass
+	void addImpulse(Vector2 impulse);
 
-	//TODO: Add shape/collider functionality
+	// Accelerates without relation to mass
+	void addAccel(Vector2 accel);
+	// sets velocity
+	void addVelocityChange(Vector2 delta);
 
-	//---------
-	void setupObj();
-	void draw();
-
-	void physicsTick(float delta);
-
-	void translate(float newX, float newY);
-	void translate(Vector2 newPos);
-	void applyForces(Vector2 direction, float force);
-	void applyForces(Vector2 force);
-	void applyForcesToActor(physicsObject* otherActor, Vector2 force);
-
-	void displaceFromActor(physicsObject* otherActor);
-	void resolveCollision(physicsObject* otherActor);
-
-	//TODO: Add functions for applying/getting force
+	float getMomentum() const;
 };
 

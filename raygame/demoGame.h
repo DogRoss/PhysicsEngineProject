@@ -1,9 +1,9 @@
 #pragma once
 
-#include "baseGame.h" //inheriting from baseGame
+#include "baseGame.h" // inheriting from base game
 
-class demoGame : public baseGame {
+class demoGame : baseGame {
 public:
-
 	void onTick() override;
+	void onDraw() const override;
 };

@@ -153,6 +153,7 @@
     <ClInclude Include="baseGame.h" />
     <ClInclude Include="demoGame.h" />
     <ClInclude Include="enumUtil.h" />
+    <ClInclude Include="mathTools.h" />
     <ClInclude Include="physicsObject.h" />
     <ClInclude Include="shapes.h" />
   </ItemGroup>

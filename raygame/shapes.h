@@ -9,8 +9,7 @@ struct circle {
 	float radius;
 };
 struct aabb {
-	//TODO: local offset
-	float size;
+	Vector2 halfExtents;
 };
 
 
@@ -32,28 +31,15 @@ struct shape {
 	};
 };
 
-bool checkCircleCircle(const Vector2& posA, circle circleA,
-					   const Vector2& posB, circle circleB);
+bool checkCircleCircle(Vector2 posA, circle circleA, Vector2 posB, circle circleB);
+bool checkAABBAABB(Vector2 posA, aabb aabbA, Vector2 posB, aabb aabbB);
+bool checkCircleAABB(Vector2 posA, circle circ, Vector2 posB, aabb ab);
 
-// wrapper for the circle circle collision
-bool checkCircleCircle(const Vector2& posA, const shape& circleA,
-					   const Vector2& posB, const shape& circleB);
+void resolvePhysBodies(class physObject& lhs, class physObject& rhs, float elasticity, Vector2 normal, float pen);
 
-//check bounding box (AABB)
-bool checkAABBAABB(const Vector2& posA, aabb aabbA,
-				   const Vector2& posB, aabb aabbB);
-
-// wrapper for the AABB/AABB collision
-bool checkAABBAABB(const Vector2& posA, const shape& aabbA,
-				   const Vector2& posB, const shape& aabbB);
-
-//check circle AABB
-bool checkCircleAABB(const Vector2& posCircle, circle circle,
-				     const Vector2& posAABB, aabb aabb);
-
-// wrapper for the circle/AABB collision
-bool checkCircleAABB(const Vector2& posCircle, const shape& circle,
-				     const Vector2& posAABB, const shape& aabb);
+float resolveCollision(Vector2 posA, Vector2 velA, float massA,
+	Vector2 posB, Vector2 velB, float massB,
+	float elasticity, Vector2 normal);
 
 
 
