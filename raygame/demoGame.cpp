@@ -1,64 +1,48 @@
-#include <iostream>
-
 #include "demoGame.h"
 
 #include "raylib.h"
 
+#include <iostream>
+#include <limits>
+
 void demoGame::onTick() {
-	//left click => spawn circle
-	bool mb0 = IsMouseButtonPressed(0); //lmb
-	bool mb1 = IsMouseButtonPressed(1); //rmb
-	bool mb2 = IsMouseButtonPressed(2); //mmb
+	bool mb0 = IsMouseButtonPressed(0);
+	bool mb1 = IsMouseButtonPressed(1);
+	bool mb2 = IsMouseButtonPressed(2);
 
-	if (mb0) {
-		std::cout << "mouse down" << std::endl;
+	if (mb0 || mb1 || mb2) {
+		physicsObjects.emplace_back();
+		std::cout << "Physics object placed." << std::endl;
 
-		physObjs.emplace_back();
+		auto& babyPhys = physicsObjects[physicsObjects.size() - 1];
+		auto mousePos = GetMousePosition();
+		babyPhys.pos = { mousePos.x, mousePos.y };
 
-		//reference newly created object
-		physicsObject& babyPhys = physObjs.back();
-		Vector2 mousePos = GetMousePosition();
-		babyPhys.position = { mousePos };
-		babyPhys.setupObj();
-		
-
-		shape babyCircle;
-		babyCircle.type = shapeType::CIRCLE;
-		babyCircle.circleData.radius = 25.0f;
-		babyPhys.collider = babyCircle;
-	}
-
-	if (mb1) {
-		physObjs.emplace_back();
-
-		//reference newly created object
-		physicsObject& babyPhys = physObjs.back();
-		Vector2 mousePos = GetMousePosition();
-		babyPhys.position = { mousePos };
-		babyPhys.setupObj();
-
-		shape babySquare;
-		babySquare.type = shapeType::AABB;
-		babySquare.aabbData.size = 25.0f;
-		babyPhys.collider = babySquare;
-	}
-
-	if (mb2) {
-		std::cout << "mmb down" << std::endl;
-
-		physObjs.emplace_back();
-
-		//reference newly created object
-		physicsObject& babyPhys = physObjs.back();
-		Vector2 mousePos = GetMousePosition();
-		babyPhys.position = { mousePos };
-		babyPhys.setupObj();
-		babyPhys.isStatic = true;
-
-		shape babySquare;
-		babySquare.type = shapeType::AABB;
-		babySquare.aabbData.size = 50.0f;
-		babyPhys.collider = babySquare;
+		if (mb0) {
+			shape circS;
+			circS.type = shapeType::CIRCLE;
+			circS.circleData = circle { 25.0f };
+			babyPhys.collider = circS;
+		}
+		else if (mb1) {
+			shape aabbS;
+			aabbS.type = shapeType::AABB;
+			aabbS.aabbData = aabb{ Vector2{ 50.0f / 2.0f , 25.0f / 2.0f  } };
+			babyPhys.collider = aabbS;
+			babyPhys.isStatic = false;
+		}
+		else if (mb2) {
+			shape aabbS;
+			aabbS.type = shapeType::AABB;
+			aabbS.aabbData = aabb{ Vector2 {30.0f, 30.0f} };
+			babyPhys.collider = aabbS;
+			babyPhys.isStatic = true;
+		}
 	}
 }
 
+void demoGame::onDraw() const {
+	DrawText("Left-click to add a dynamic ball to the scene.", 5, 5, 20, BLACK);
+	DrawText("Right-click to add a small dynamic box to the scene.", 5, 25, 20, BLACK);
+	DrawText("Middle-click to add a static box to the scene.", 5, 45, 20, BLACK);
+}

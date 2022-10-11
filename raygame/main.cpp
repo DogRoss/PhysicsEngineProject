@@ -13,36 +13,25 @@
 
 int main()
 {
-	// Initialization
-	//--------------------------------------------------------------------------------------
-	demoGame game = *new demoGame();
-	game.init();
-	//--------------------------------------------------------------------------------------
+	baseGame* app = new demoGame();
+	app->init();
+	app->targetFixedStep = 1.0f / 30.0f;
+	app->gravityScale = 50.0f;
+	app->useGravity = true;
+	app->useWrapping = true;
 
-	// Main game loop
-	while (!WindowShouldClose())    // Detect window close button or ESC key
-	{
-		game.tick();
+	while (!app->shouldClose()) {
+		app->tick();
 
-		while (game.shouldFixedUpdate()) {
-			//fixed update
-			//mainly used for physics update
-			game.fixedTick();
-		}
-		
-		// Draw
-		//----------------------------------------------------------------------------------
-		BeginDrawing();
+		while (app->shouldTickFixed())
+			app->tickFixed();
 
-		ClearBackground(RAYWHITE);
-
-		DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
-
-		EndDrawing();
-		//----------------------------------------------------------------------------------
+		app->draw();
 	}
 
-	game.exit();
+	app->exit();
+
+	delete app;
 
 	return 0;
 }

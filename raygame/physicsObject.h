@@ -21,7 +21,7 @@ public:
 
 	shape collider;
 
-	void tickPhys(Vector2 force);
+	void tickPhys(float delta);
 	void draw() const;
 
 	// Add continous force in relation to mass

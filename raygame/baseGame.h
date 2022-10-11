@@ -13,6 +13,7 @@ using depenetrationFunc = Vector2(*)(const Vector2&, const shape&, const Vector2
 using depenetrationMap = std::unordered_map <collisionPair, depenetrationFunc>;
 
 class baseGame {
+protected:
 	float accumulatedFixedTime;
 
 	std::vector<physicsObject> physicsObjects;

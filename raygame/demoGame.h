@@ -2,7 +2,7 @@
 
 #include "baseGame.h" // inheriting from base game
 
-class demoGame : baseGame {
+class demoGame : public baseGame {
 public:
 	void onTick() override;
 	void onDraw() const override;

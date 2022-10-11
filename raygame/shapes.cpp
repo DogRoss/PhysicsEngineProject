@@ -1,78 +1,107 @@
 #include "shapes.h"
 
-bool checkCircleCircle(const Vector2& posA, circle circleA, 
-					   const Vector2& posB, circle circleB) 
-{
-	/* retrieve sum of the radii
-	   calculate distance between their centers
-	   if distance is less than the sum, they're in-collision
-	   
-	   ! PERF: you can do this w/o sqrt call if you compare the 
-		       squares of these values instead if the actual values */
+#include "mathTools.h"
+#include "physicsObject.h"
 
+bool checkCircleCircle(Vector2 posA, circle circleA, Vector2 posB, circle circleB) {
+	// get the distance
+	Vector2 offset = (posA - posB);
+	float distSQ = Vector2DotProduct(offset, offset);
+	//get the sum of the radii
 	float sum = circleA.radius + circleB.radius;
 
-	//get distance between shape centers
-	float dist2 = Vector2Distance(posA, posB);
+	std::cout << "checkCircleCircle return: " << (distSQ < (sum* sum)) << std::endl;
 
-	dist2 *= dist2;
-
-	return dist2 < sum * sum;
+	return distSQ < (sum * sum);
 }
 
-bool checkCircleCircle(const Vector2& posA, const shape& circleA, const Vector2& posB, const shape& circleB)
-{
-	return checkCircleCircle(posA, circleA.circleData, posB, circleB.circleData);
+bool checkAABBAABB(Vector2 posA, aabb aabbA, Vector2 posB, aabb aabbB) {
+	std::cout << "checkAABBAABB return: " << (
+		posA.x - aabbA.halfExtents.x < posB.x + aabbB.halfExtents.x && // l within r
+		posA.x + aabbA.halfExtents.x > posB.x - aabbB.halfExtents.x && // r within l
+		posA.y - aabbA.halfExtents.y < posB.y + aabbB.halfExtents.y && // t within b
+		posA.y + aabbA.halfExtents.y > posB.y - aabbB.halfExtents.y    // b within t
+		) << std::endl;
+
+
+	return posA.x - aabbA.halfExtents.x < posB.x + aabbB.halfExtents.x && // l within r
+		   posA.x + aabbA.halfExtents.x > posB.x - aabbB.halfExtents.x && // r within l
+		   posA.y - aabbA.halfExtents.y < posB.y + aabbB.halfExtents.y && // t within b
+		   posA.y + aabbA.halfExtents.y > posB.y - aabbB.halfExtents.y;   // b within t
+}		
+
+bool checkCircleAABB(Vector2 posA, circle circ, Vector2 posB, aabb ab) {
+	// find nearest point to AABB in direction towards circle
+	//
+	// we can do this by clamping center of circle to AABB bounds
+	std::cout << "enter circleaabb" << std::endl;
+
+	float distX = posA.x - Clamp(posA.x, posB.x - ab.halfExtents.x, posB.x + ab.halfExtents.x);
+	float distY = posA.y - Clamp(posA.y, posB.y - ab.halfExtents.y, posB.y + ab.halfExtents.y);
+
+	std::cout << "checkCircleAABB return: " << ((distX * distX + distY * distY) < (circ.radius * circ.radius)) << std::endl;
+
+	return ((distX * distX) + (distY * distY)) < (circ.radius * circ.radius);
 }
 
-bool checkAABBAABB(const Vector2& posA, aabb aabbA, const Vector2& posB, aabb aabbB)
-{
+//TODO: Vector2 -= Vector2 might not work, check when using
+void resolvePhysicsBodies(physicsObject& lhs, class physicsObject& rhs, float elasticity, Vector2 normal, float pen) {
+	std::cout << "resolving physics" << std::endl;
 
-	// y pos is top edge
-	// x pos is left edge
-	float a_rightEdge = posA.x + aabbA.size, a_topEdge = posA.y + aabbA.size;
-	float b_rightEdge = posB.x + aabbB.size, b_topEdge = posB.y + aabbB.size;
-
-	if (a_rightEdge >= posB.x && // a_rightEdge passes b_leftEdge
-		posA.x <= b_rightEdge && // a_leftEdge passes b_rightEdge
-		a_topEdge >= posB.y && // a_topEdge passes b_bottomEdge
-		posA.y <= b_topEdge) { // a_bottomEdge passes b_topEdge
-		std::cout << "COLLISION" << std::endl;
-		return true;
+	if (Vector2Length(normal) == 0) {
+		normal.y = -1.0f;
 	}
-	return false;
-}
 
-bool checkAABBAABB(const Vector2& posA, const shape& aabbA, const Vector2& posB, const shape& aabbB)
-{
-	return checkAABBAABB(posA, aabbA.aabbData, posB, aabbB.aabbData);
-}
-
-bool checkCircleAABB(const Vector2& posCircle, circle circle, const Vector2& posAABB, aabb aabb)
-{
-	float testX = posCircle.x, testY = posCircle.y;
-
-	if (posCircle.x < posAABB.x) //left edge
-		testX = posAABB.x;
-	else if (posCircle.x > posAABB.x + aabb.size) //right edge
-		testX = posAABB.x + aabb.size;
-
-	if (posCircle.y < posAABB.y) //top edge
-		testY = posAABB.y;
-	else if (posCircle.y > posAABB.y + aabb.size) //bottom edge
-		testY = posAABB.y + aabb.size;
-
-	float distX = posCircle.x - testX;
-	float distY = posCircle.y - testY;
-	float distance = sqrt((distX * distX) + (distY * distY));
-
-	if (distance <= circle.radius) {
-		return true;
+	// depenetrate objects
+	if (!lhs.isStatic) {
+		lhs.pos += normal * pen;
 	}
-	return false;
+	if (!rhs.isStatic)
+	{
+		rhs.pos -= normal * pen;
+	}
+
+	//TODO: add debug
+	// calculate resolution impulse
+	// nromal and pen are passed by reference and will be updated
+	float impulseMag = resolveCollision(lhs.pos, lhs.vel, lhs.mass, rhs.pos, rhs.vel, rhs.mass, elasticity, normal);
+	if (lhs.isStatic || rhs.isStatic) { impulseMag *= 2.0f; }
+	Vector2 impulse = impulseMag * normal;
+
+	std::cout << "impulse force: " << impulse.x << ", " << impulse.y << std::endl;
+
+	if (!(lhs.isStatic || rhs.isStatic)) {
+		pen *= .51f;
+	}
+
+	// depenetrate (aka seperate the two objects)
+	if (!lhs.isStatic) {
+		lhs.addImpulse(impulse);
+	}
+	if (!rhs.isStatic) {
+		rhs.addImpulse(-impulse);
+	}
+
+	//TODO: add debug
 }
 
-bool checkCircleAABB(const Vector2& posCircle, const shape& circle, const Vector2& posAABB, const shape& aabb)
+float resolveCollision(Vector2 posA, Vector2 velA, float massA, Vector2 posB, Vector2 velB, float massB, float elasticity, Vector2 normal)
 {
-	return checkCircleAABB(posCircle, circle.circleData, posAABB, aabb.aabbData);
+	std::cout << "resolving collisions" << std::endl;
+
+	if (Vector2Length(normal) == 0) {
+		normal.y = -1.0f;
+	}
+
+	// calculate the relative velocity
+	Vector2 relVel = velA - velB;
+
+	// calculate impulse mag
+	float impulseMag = Vector2DotProduct(-(1.0f + elasticity) * relVel, normal) /
+					   Vector2DotProduct(normal, normal * (1 / massA + 1 / massB));
+
+	std::cout << "impulse magnitude for collision: " << impulseMag << std::endl;
+
+	//return impulse that applies to both objects
+	return impulseMag;
 }
