@@ -15,7 +15,7 @@ int main()
 {
 	baseGame* app = new demoGame();
 	app->init();
-	app->targetFixedStep = 1.0f / 30.0f;
+	app->targetFixedStep = 1.0f / 100.0f;
 	app->gravityScale = 50.0f;
 	app->useGravity = true;
 	app->useWrapping = true;

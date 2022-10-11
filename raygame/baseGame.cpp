@@ -9,6 +9,8 @@
 #include "enumUtil.h"
 #include "mathTools.h"
 
+using namespace collisionResolution;
+
 bool checkCircleCircle(const Vector2& posA, const shape& shapeA, const Vector2& posB, const shape& shapeB);
 bool checkAABBAABB(const Vector2& posA, const shape& shapeA, const Vector2& posB, const shape& shapeB);
 bool checkCircleAABB(const Vector2& posA, const shape& shapeA, const Vector2& posB, const shape& shapeB);
@@ -17,6 +19,10 @@ Vector2 depenetrateCircleCircle(const Vector2& posA, const shape& shapeA, const 
 Vector2 depenetrateAABBAABB(const Vector2& posA, const shape& shapeA, const Vector2& posB, const shape& shapeB, float& pen);
 Vector2 depenetrateCircleAABB(const Vector2& posA, const shape& shapeA, const Vector2& posB, const shape& shapeB, float& pen);
 
+/// <summary>
+/// maps out what type of collision check functions are used, and what shapes apply to what function
+/// </summary>
+/// <returns></returns>
 collisionMap setupCollisionChecks() {
 	collisionMap map;
 
@@ -27,6 +33,10 @@ collisionMap setupCollisionChecks() {
 	return map;
 }
 
+/// <summary>
+/// maps out what type of depenetration functions are used, and what shapes apply to what function
+/// </summary>
+/// <returns></returns>
 depenetrationMap setupDepenetrator() {
 	depenetrationMap map;
 
@@ -40,20 +50,52 @@ depenetrationMap setupDepenetrator() {
 collisionMap baseGame::collisionCheckers = setupCollisionChecks();
 depenetrationMap baseGame::collisionDepenetrators = setupDepenetrator();
 
+/// <summary>
+/// collision check wrapper for Circle/Circle collisions
+/// </summary>
+/// <param name="posA"></param>
+/// <param name="shapeA"></param>
+/// <param name="posB"></param>
+/// <param name="shapeB"></param>
+/// <returns></returns>
 bool checkCircleCircle(const Vector2& posA, const shape& shapeA, const Vector2& posB, const shape& shapeB) {
 	return checkCircleCircle(posA, shapeA.circleData, posB, shapeB.circleData);
 }
 
+/// <summary>
+/// collision check wrapper for AABB/AABB collisions
+/// </summary>
+/// <param name="posA"></param>
+/// <param name="shapeA"></param>
+/// <param name="posB"></param>
+/// <param name="shapeB"></param>
+/// <returns></returns>
 bool checkAABBAABB(const Vector2& posA, const shape& shapeA, const Vector2& posB, const shape& shapeB) {
 	return checkAABBAABB(posA, shapeA.aabbData, posB, shapeB.aabbData);
 }
 
+/// <summary>
+/// collision check wrapper for Circle/AABB collisions
+/// </summary>
+/// <param name="posA"></param>
+/// <param name="shapeA"></param>
+/// <param name="posB"></param>
+/// <param name="shapeB"></param>
+/// <returns></returns>
 bool checkCircleAABB(const Vector2& posA, const shape& shapeA, const Vector2& posB, const shape& shapeB) {
 	return checkCircleAABB(posA, shapeA.circleData, posB, shapeB.aabbData);
 }
 
-// Returns mtv direction
-// Out penetration depth stored in 'pen'
+/// <summary>
+/// Returns mtv direction, or direction towards outside of collided circle
+/// Out penetration depth stored in 'pen'
+/// </summary>
+/// <param name="posA"></param>
+/// <param name="shapeA"></param>
+/// <param name="posB"></param>
+/// <param name="shapeB"></param>
+/// <param name="pen"></param>
+/// <returns></returns>
 Vector2 depenetrateCircleCircle(const Vector2& posA, const shape& shapeA, const Vector2& posB, const shape& shapeB, float& pen) {
 	float dist = Vector2Length(posA - posB);
 	float sum = shapeA.circleData.radius + shapeB.circleData.radius;
@@ -63,6 +105,16 @@ Vector2 depenetrateCircleCircle(const Vector2& posA, const shape& shapeA, const 
 	return Vector2Normalize(posA - posB);
 }
 
+/// <summary>
+/// Returns mtv direction, or direction towards outside of collided aabb
+/// Out penetration depth stored in 'pen'
+/// </summary>
+/// <param name="posA"></param>
+/// <param name="shapeA"></param>
+/// <param name="posB"></param>
+/// <param name="shapeB"></param>
+/// <param name="pen"></param>
+/// <returns></returns>
 Vector2 depenetrateAABBAABB(const Vector2& posA, const shape& shapeA, const Vector2& posB, const shape& shapeB, float& pen) {
 	float mtvDist = 0.0f;
 	Vector2 mtvAxis = {};
@@ -87,12 +139,23 @@ Vector2 depenetrateAABBAABB(const Vector2& posA, const shape& shapeA, const Vect
 	return mtvAxis;
 }
 
-//TODO: Vec2DotProduct() might not work correct, same with Vec2Absolute()
+
+/// <summary>
+/// Returns mtv direction, or direction towards outside of collided circle/aabb
+/// Out penetration depth stored in 'pen'
+/// </summary>
+/// <param name="posA"></param>
+/// <param name="shapeA"></param>
+/// <param name="posB"></param>
+/// <param name="shapeB"></param>
+/// <param name="pen"></param>
+/// <returns></returns>
 Vector2 depenetrateCircleAABB(const Vector2& posA, const shape& shapeA, const Vector2& posB, const shape& shapeB, float& pen) {
+	//TODO: Vec2DotProduct() might not work correct, same with Vec2Absolute()
+
 	Vector2 circConstrained = Vector2Clamp(posA, posB - shapeB.aabbData.halfExtents, posB + shapeB.aabbData.halfExtents);
 	Vector2 circOffset = circConstrained - posA;
 	float distSQ = Vector2DotProduct(circOffset, circOffset);
-	std::cout << "distSQ dot product return value: " << distSQ << std::endl;
 	float radiusSQ = shapeA.circleData.radius * shapeA.circleData.radius;
 
 	if (distSQ < radiusSQ) {
@@ -151,6 +214,9 @@ void baseGame::init() {
 	onInit();
 }
 
+/// <summary>
+/// frame by frame update
+/// </summary>
 void baseGame::tick() {
 	// update
 	accumulatedFixedTime += GetFrameTime();
@@ -158,6 +224,9 @@ void baseGame::tick() {
 	onTick();
 }
 
+/// <summary>
+/// frame by set interval update
+/// </summary>
 void baseGame::tickFixed() {
 	// do physics
 	accumulatedFixedTime -= targetFixedStep;
@@ -188,8 +257,8 @@ void baseGame::tickFixed() {
 				if (i.isStatic) { continue; }
 
 				// collider type w/ lower number should always be left
-				auto* lhs = &i;
-				auto* rhs = &j;
+				collisionResolution::physicsObject* lhs = &i;
+				collisionResolution::physicsObject* rhs = &j;
 
 				if (static_cast<uint8_t>(i.collider.type) > static_cast<uint8_t>(j.collider.type)) {
 					lhs = &j;
@@ -209,11 +278,6 @@ void baseGame::tickFixed() {
 					//			  we'll get a zero vector which will result in
 					//			  degenerate floating point values
 					if (lhs->pos == rhs->pos) { normal = { 0, 1 }; }
-					// TODO: DEBUG HERE
-					// DEBUG HERE
-					float debugLength = Vector2Length(normal);
-					std::cout << "debugLength: " << debugLength << std::endl;
-					//assert((float)abs(debugLength - 1.0f) < FLT_EPSILON * 100);
 
 					resolvePhysicsBodies(*lhs, *rhs, 1.0f, normal, pen);
 				}

@@ -72,7 +72,7 @@ inline Vector2 Vector2Clamp(Vector2 vec, float xMin, float xMax, float yMin, flo
 		returnVec.x = xMin;
 
 	if (vec.y > yMax)
-		returnVec.y = xMax;
+		returnVec.y = yMax;
 	else if (vec.y < yMin)
 		returnVec.y = yMin;
 

@@ -16,6 +16,11 @@ physicsObject::physicsObject() {
 	useGravity = true;
 }
 
+/// <summary>
+/// fixed update for physics update
+/// updated at a fixed rate
+/// </summary>
+/// <param name="delta"></param>
 void physicsObject::tickPhys(float delta) {
 	if (isStatic) { return; }
 
@@ -47,18 +52,34 @@ void physicsObject::draw() const {
 	}
 }
 
+/// <summary>
+/// adds force with regard to mass
+/// </summary>
+/// <param name="force"></param>
 void physicsObject::addForce(Vector2 force) {
 	forces += force * (1.0f / mass);
 }
 
+/// <summary>
+/// adds force without regard to mass
+/// </summary>
+/// <param name="accel"></param>
 void physicsObject::addAccel(Vector2 accel) {
 	forces += accel;
 }
 
+/// <summary>
+/// adds impulse force with regard to mass
+/// </summary>
+/// <param name="impulse"></param>
 void physicsObject::addImpulse(Vector2 impulse) {
 	vel += impulse * (1.0f / mass);
 }
 
+/// <summary>
+/// changes velocity without regard to mass
+/// </summary>
+/// <param name="delta"></param>
 void physicsObject::addVelocityChange(Vector2 delta) {
 	vel += delta;
 }

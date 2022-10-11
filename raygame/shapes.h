@@ -31,15 +31,18 @@ struct shape {
 	};
 };
 
-bool checkCircleCircle(Vector2 posA, circle circleA, Vector2 posB, circle circleB);
-bool checkAABBAABB(Vector2 posA, aabb aabbA, Vector2 posB, aabb aabbB);
-bool checkCircleAABB(Vector2 posA, circle circ, Vector2 posB, aabb ab);
+namespace collisionResolution {
+	bool checkCircleCircle(Vector2 posA, circle circleA, Vector2 posB, circle circleB);
+	bool checkAABBAABB(Vector2 posA, aabb aabbA, Vector2 posB, aabb aabbB);
+	bool checkCircleAABB(Vector2 posA, circle circ, Vector2 posB, aabb ab);
 
-void resolvePhysicsBodies(class physicsObject& lhs, class physicsObject& rhs, float elasticity, Vector2 normal, float pen);
+	void resolvePhysicsBodies(class physicsObject& lhs, class physicsObject& rhs, float elasticity, Vector2 normal, float pen);
 
-float resolveCollision(Vector2 posA, Vector2 velA, float massA,
-	Vector2 posB, Vector2 velB, float massB,
-	float elasticity, Vector2 normal);
+	float resolveCollision(Vector2 posA, Vector2 velA, float massA,
+		Vector2 posB, Vector2 velB, float massB,
+		float elasticity, Vector2 normal);
+}
+
 
 
 
