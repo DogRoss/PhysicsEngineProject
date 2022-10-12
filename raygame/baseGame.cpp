@@ -9,8 +9,6 @@
 #include "enumUtil.h"
 #include "mathTools.h"
 
-using namespace collisionResolution;
-
 bool checkCircleCircle(const Vector2& posA, const shape& shapeA, const Vector2& posB, const shape& shapeB);
 bool checkAABBAABB(const Vector2& posA, const shape& shapeA, const Vector2& posB, const shape& shapeB);
 bool checkCircleAABB(const Vector2& posA, const shape& shapeA, const Vector2& posB, const shape& shapeB);
@@ -257,8 +255,8 @@ void baseGame::tickFixed() {
 				if (i.isStatic) { continue; }
 
 				// collider type w/ lower number should always be left
-				collisionResolution::physicsObject* lhs = &i;
-				collisionResolution::physicsObject* rhs = &j;
+				physicsObject* lhs = &i;
+				physicsObject* rhs = &j;
 
 				if (static_cast<uint8_t>(i.collider.type) > static_cast<uint8_t>(j.collider.type)) {
 					lhs = &j;

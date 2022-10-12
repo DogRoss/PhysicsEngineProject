@@ -5,7 +5,6 @@
 
 #include <string>
 
-namespace collisionResolution {
 /// <summary>
 /// checks if collider-Circle 'A' is in collider-Circle 'B' 
 /// </summary>
@@ -130,5 +129,4 @@ float resolveCollision(Vector2 posA, Vector2 velA, float massA, Vector2 posB, Ve
 
 	//return impulse that applies to both objects
 	return impulseMag;
-}
 }
